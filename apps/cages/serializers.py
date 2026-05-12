@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Cage, Occupation
+from .models import Cage, Occupation, HistoriqueCage
 from apps.pigeons.serializers import PigeonSerializer
 from apps.couples.serializers import CoupleSerializer
 
@@ -44,3 +44,22 @@ class OccupationSerializer(serializers.ModelSerializer):
             'date_debut', 'date_fin'
         ]
         read_only_fields = ['id', 'date_debut']
+
+
+
+
+
+
+
+
+# apps/cages/serializers.py
+class HistoriqueCageSerializer(serializers.ModelSerializer):
+    utilisateur_nom = serializers.CharField(source='utilisateur.username', read_only=True)
+    date_formatee = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = HistoriqueCage
+        fields = ['id', 'type_action', 'description', 'date_action', 'date_formatee', 'utilisateur_nom', 'metadata']
+    
+    def get_date_formatee(self, obj):
+        return obj.date_action.strftime('%d/%m/%Y')

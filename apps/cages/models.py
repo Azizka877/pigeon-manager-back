@@ -2,6 +2,7 @@
 from django.db import models
 import uuid
 from django.utils import timezone
+from django.conf import settings
 
 class Cage(models.Model):
     """
@@ -75,3 +76,29 @@ class Occupation(models.Model):
         """Libère la cage"""
         self.date_fin = timezone.now()
         self.save()
+
+
+
+class HistoriqueCage(models.Model):
+    TYPE_ACTION = [
+        ('occupation', 'Occupation'),
+        ('liberation', 'Libération'),
+        ('nettoyage', 'Nettoyage'),
+        ('creation', 'Création'),
+        ('modification', 'Modification'),
+    ]
+    
+    cage = models.ForeignKey('Cage', on_delete=models.CASCADE, related_name='historiques')
+    type_action = models.CharField(max_length=20, choices=TYPE_ACTION)
+    description = models.TextField()
+    date_action = models.DateTimeField(auto_now_add=True)
+    utilisateur = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    
+    # Données supplémentaires (JSON pour flexibilité)
+    metadata = models.JSONField(default=dict, blank=True)
+    
+    class Meta:
+        ordering = ['-date_action']
+    
+    def __str__(self):
+        return f"{self.cage.numero} - {self.type_action} - {self.date_action}"
