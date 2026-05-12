@@ -177,7 +177,7 @@ else:
     CORS_ALLOW_ALL_ORIGINS = False
     CORS_ALLOWED_ORIGINS = os.getenv(
         'CORS_ALLOWED_ORIGINS',
-        'https://pigeonmanager.vercel.app'
+        'https://pigeon-manager-frontend.vercel.app'
     ).split(',')
 
 CORS_ALLOW_CREDENTIALS = True
