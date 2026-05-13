@@ -1,7 +1,8 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from .models import Pigeon, PigeonEvent
+from .models import Pigeon
 from .serializers import PigeonSerializer, PigeonEventSerializer
+from rest_framework.response import Response
 
 class PigeonViewSet(viewsets.ModelViewSet):
     queryset = Pigeon.objects.filter(deleted_at__isnull=True)
