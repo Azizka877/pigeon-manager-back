@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Pigeon
+from .models import Pigeon, PigeonEvent
 
 class PigeonSerializer(serializers.ModelSerializer):
     age = serializers.SerializerMethodField()
@@ -26,3 +26,13 @@ class PigeonSerializer(serializers.ModelSerializer):
                 age -= 1
             return age
         return None
+
+
+
+class PigeonEventSerializer(serializers.ModelSerializer):
+    type_display = serializers.CharField(source='get_type_display', read_only=True)
+    
+    class Meta:
+        model = PigeonEvent
+        fields = ['id', 'pigeon', 'type', 'type_display', 'date', 'description', 'created_at']
+        read_only_fields = ['created_at']

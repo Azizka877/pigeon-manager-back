@@ -72,3 +72,23 @@ class Pigeon(models.Model):
         return today.year - self.date_naissance.year - (
             (today.month, today.day) < (self.date_naissance.month, self.date_naissance.day)
         )
+        
+        
+
+class PigeonEvent(models.Model):
+    TYPE_CHOICES = [
+        ('medical', 'Médical'),
+        ('vaccination', 'Vaccination'),
+        ('reproduction', 'Reproduction'),
+        ('concours', 'Concours'),
+        ('autre', 'Autre'),
+    ]
+    
+    pigeon = models.ForeignKey(Pigeon, on_delete=models.CASCADE, related_name='events')
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    date = models.DateField()
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-date']
