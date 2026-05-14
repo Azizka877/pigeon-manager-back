@@ -40,7 +40,7 @@ def activites_recentes(request):
             'type': 'pigeon',
             'type_action': 'creation',
             'titre': f'Nouveau pigeon {p.matricule}',
-            'description': f'{p.race} ({p.sexe_display}) ajouté',
+            'description': f'{p.matricule} - {p.race} ({p.get_sexe_display()})',
             'date': p.created_at,
             'utilisateur': None,
             'metadata': {'matricule': p.matricule, 'sexe': p.sexe},
