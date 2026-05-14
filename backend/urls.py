@@ -41,4 +41,5 @@ urlpatterns = [
     path('api/sorties/', include('apps.sales.urls')),
      path('api/colombier/', include('apps.colombier.urls')),
     path('api/users/', include('apps.users.urls')),
+    path('api/', include('apps.dashboard.urls')),
 ]
