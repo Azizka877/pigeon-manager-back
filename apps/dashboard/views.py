@@ -1,8 +1,8 @@
-# apps/dashboard/views.py (nouveau fichier)
+# apps/dashboard/views.py
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime, date
 
 from apps.cages.models import HistoriqueCage
 from apps.pigeons.models import Pigeon
@@ -23,7 +23,7 @@ def activites_recentes(request):
         activites.append({
             'id': f'hist-{h.id}',
             'type': 'cage',
-            'type_action': h.type_action,  # 'occupation' ou 'liberation'
+            'type_action': h.type_action,
             'titre': f'Cage {h.cage.numero} - {h.type_action}',
             'description': h.description,
             'date': h.date_action,
@@ -54,14 +54,14 @@ def activites_recentes(request):
             'type': 'couple',
             'type_action': 'formation',
             'titre': f'Nouveau couple formé',
-           'description': f'{c.male} + {c.femelle}',
+            'description': f'{c.male} + {c.femelle}',
             'date': c.date_formation,
             'utilisateur': None,
             'metadata': {'male': c.male, 'femelle': c.femelle},
         })
     
     # 4. Nouvelles reproductions
-    nouvelles_repros = nouvelles_repros = Reproduction.objects.filter(date_ponte__gte=depuis).order_by('-date_ponte')[:limit]
+    nouvelles_repros = Reproduction.objects.filter(date_ponte__gte=depuis).order_by('-date_ponte')[:limit]
     for r in nouvelles_repros:
         activites.append({
             'id': f'repro-{r.id}',
@@ -69,14 +69,13 @@ def activites_recentes(request):
             'type_action': 'debut',
             'titre': 'Nouvelle reproduction',
             'description': f'Couple {r.couple_id}',
-            'date': r.date_ponte,  # ✅ CORRIGÉ
+            'date': r.date_ponte,
             'badge': 'Repro',
         })
-    # 5. Sorties (ventes, pertes, décès)
-        # 5. Sorties récentes
+    
+    # 5. Sorties récentes
     sorties_recentes = Sortie.objects.filter(date_sortie__gte=depuis).order_by('-date_sortie')[:limit]
     for s in sorties_recentes:
-        # Description selon le type
         if s.type_sortie == 'vente':
             description = f'Vendu à {s.acheteur or "Inconnu"}' + (f' ({s.prix}€)' if s.prix else '')
         else:
@@ -87,12 +86,19 @@ def activites_recentes(request):
             'type': 'sortie',
             'type_action': s.type_sortie,
             'titre': f'Pigeon {s.get_type_sortie_display()}',
-            'description': description,  # ✅ CORRIGÉ
+            'description': description,
             'date': s.date_sortie,
             'badge': s.type_sortie,
         })
+    
+    # ✅ CORRIGÉ : Fonction pour convertir date en datetime
+    def to_datetime(d):
+        if isinstance(d, date) and not isinstance(d, datetime):
+            return datetime.combine(d, datetime.min.time())
+        return d
+    
     # Trier par date décroissante et limiter
-    activites.sort(key=lambda x: x['date'], reverse=True)
+    activites.sort(key=lambda x: to_datetime(x['date']), reverse=True)
     activites = activites[:limit]
     
     return Response({
