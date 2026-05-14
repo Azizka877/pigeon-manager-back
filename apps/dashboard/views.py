@@ -54,7 +54,7 @@ def activites_recentes(request):
             'type': 'couple',
             'type_action': 'formation',
             'titre': f'Nouveau couple formé',
-            'description': f'{c.male_details.matricule} + {c.femelle_details.matricule}',
+           'description': f'{c.male} + {c.femelle}',
             'date': c.date_formation,
             'utilisateur': None,
             'metadata': {'male': c.male, 'femelle': c.femelle},
