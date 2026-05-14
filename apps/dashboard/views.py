@@ -13,7 +13,7 @@ from apps.sales.models import Sortie
 @api_view(['GET'])
 def activites_recentes(request):
     """GET /api/activites/?limit=10"""
-    limit = int(request.query_params.get('limit', 10))
+    limit = int(request.query_params.get('limit', 5))
     
     activites = []
     
