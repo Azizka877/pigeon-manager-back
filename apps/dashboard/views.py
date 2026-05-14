@@ -61,19 +61,17 @@ def activites_recentes(request):
         })
     
     # 4. Nouvelles reproductions
-    nouvelles_repros = Reproduction.objects.filter(date_debut__gte=depuis).order_by('-date_debut')[:limit]
+    nouvelles_repros = nouvelles_repros = Reproduction.objects.filter(date_ponte__gte=depuis).order_by('-date_ponte')[:limit]
     for r in nouvelles_repros:
         activites.append({
             'id': f'repro-{r.id}',
             'type': 'reproduction',
             'type_action': 'debut',
-            'titre': f'Nouvelle reproduction',
+            'titre': 'Nouvelle reproduction',
             'description': f'Couple {r.couple_id}',
-            'date': r.date_debut,
-            'utilisateur': None,
-            'metadata': {'couple_id': str(r.couple_id)},
+            'date': r.date_ponte,  # ✅ CORRIGÉ
+            'badge': 'Repro',
         })
-    
     # 5. Sorties (ventes, pertes, décès)
     sorties = Sortie.objects.filter(date_sortie__gte=depuis).order_by('-date_sortie')[:limit]
     for s in sorties:
