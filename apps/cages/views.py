@@ -15,13 +15,8 @@ class CageViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def occuper(self, request, pk=None):
-        """
-        POST /cages/{id}/occuper/
-        Body: { pigeon?: string, couple?: string, type_occupation: 'seul' | 'couple' }
-        """
         cage = self.get_object()
         
-        # Vérifier si la cage est déjà occupée
         occupation_active = cage.occupations.filter(date_fin__isnull=True).first()
         if occupation_active:
             return Response(
@@ -30,8 +25,8 @@ class CageViewSet(viewsets.ModelViewSet):
             )
         
         type_occupation = request.data.get('type_occupation')
-        pigeon_id = request.data.get('pigeon')
-        couple_id = request.data.get('couple')
+        pigeon_id = request.data.get('pigeon_id')      # ✅ Corrigé : 'pigeon_id' au lieu de 'pigeon'
+        couple_id = request.data.get('couple_id')      # ✅ Corrigé : 'couple_id' au lieu de 'couple'
         
         try:
             with transaction.atomic():
