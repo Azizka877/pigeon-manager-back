@@ -73,19 +73,24 @@ def activites_recentes(request):
             'badge': 'Repro',
         })
     # 5. Sorties (ventes, pertes, décès)
-    sorties = Sortie.objects.filter(date_sortie__gte=depuis).order_by('-date_sortie')[:limit]
-    for s in sorties:
+        # 5. Sorties récentes
+    sorties_recentes = Sortie.objects.filter(date_sortie__gte=depuis).order_by('-date_sortie')[:limit]
+    for s in sorties_recentes:
+        # Description selon le type
+        if s.type_sortie == 'vente':
+            description = f'Vendu à {s.acheteur or "Inconnu"}' + (f' ({s.prix}€)' if s.prix else '')
+        else:
+            description = s.cause or s.circonstances or ''
+        
         activites.append({
             'id': f'sortie-{s.id}',
             'type': 'sortie',
-            'type_action': s.type_sortie,  # 'vente', 'perte', 'deces'
-            'titre': f'Pigeon {s.type_sortie}',
-            'description': f'{s.pigeon.matricule} - {s.motif or ""}',
+            'type_action': s.type_sortie,
+            'titre': f'Pigeon {s.get_type_sortie_display()}',
+            'description': description,  # ✅ CORRIGÉ
             'date': s.date_sortie,
-            'utilisateur': None,
-            'metadata': {'prix': s.prix, 'acheteur': s.acheteur},
+            'badge': s.type_sortie,
         })
-    
     # Trier par date décroissante et limiter
     activites.sort(key=lambda x: x['date'], reverse=True)
     activites = activites[:limit]
