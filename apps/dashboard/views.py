@@ -17,7 +17,7 @@ def activites_recentes(request):
     
     activites = []
     
-    # 1. Historique des cages (occupations/libérations)
+    # 1. Historique des cages
     historiques = HistoriqueCage.objects.select_related('cage', 'utilisateur').order_by('-date_action')[:limit]
     for h in historiques:
         activites.append({
@@ -31,7 +31,7 @@ def activites_recentes(request):
             'metadata': h.metadata,
         })
     
-    # 2. Nouveaux pigeons (derniers 7 jours)
+    # 2. Nouveaux pigeons
     depuis = timezone.now() - timedelta(days=7)
     nouveaux_pigeons = Pigeon.objects.filter(created_at__gte=depuis).order_by('-created_at')[:limit]
     for p in nouveaux_pigeons:
@@ -91,10 +91,14 @@ def activites_recentes(request):
             'badge': s.type_sortie,
         })
     
-    # ✅ CORRIGÉ : Fonction pour convertir date en datetime
+    # ✅ CORRIGÉ : Fonction pour uniformiser les dates
     def to_datetime(d):
         if isinstance(d, date) and not isinstance(d, datetime):
-            return datetime.combine(d, datetime.min.time())
+            # date → datetime aware
+            return timezone.make_aware(datetime.combine(d, datetime.min.time()))
+        if isinstance(d, datetime) and timezone.is_naive(d):
+            # datetime naive → aware
+            return timezone.make_aware(d)
         return d
     
     # Trier par date décroissante et limiter
